@@ -157,6 +157,29 @@ tests/
 
 ---
 
+## Pre-Push Hook in Action
+
+The hook runs automatically on every push:
+```bash
+🚀 Running Symfony quality checks before push...
+🧹 Checking code style with PHP CS Fixer...
+✅ Code style is clean.
+🔍 Running PHPStan static analysis...
+✅ Static analysis passed.
+🧪 Running tests...
+✅ All tests passed.
+🔒 Checking for security vulnerabilities...
+🎉 All checks passed. Proceeding with push...
+```
+
+**Benefits:**
+- ✅ Prevents bad code from reaching repository
+- ✅ Auto-fixes formatting issues
+- ✅ Ensures tests always pass
+- ✅ Maintains code quality standards
+
+---
+
 ## 📚 Architecture Decisions (ADRs)
 
 This project documents architectural decisions in Architecture Decision Records:
