@@ -1,0 +1,18 @@
+parameters:
+    level: 6
+    paths:
+        - src
+    
+    excludePaths:
+        - src/Kernel.php
+        - var/*
+        - vendor/*
+    
+    # Symfony-specific rules
+    symfony:
+        containerXmlPath: var/cache/dev/App_KernelDevDebugContainer.xml
+        consoleApplicationLoader: tests/console-loader.php
+
+    # Ignore bootstrap for now
+    bootstrapFiles:
+        - vendor/autoload.php
