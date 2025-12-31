@@ -1,0 +1,105 @@
+services:
+
+  symfony:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: symfony-app
+    working_dir: /var/www/html
+    user: "${UID}:${GID}"
+    volumes:
+      - ./:/var/www/html
+      - ./docker/xdebug.ini:/usr/local/etc/php/conf.d/xdebug.ini
+    ports:
+      - "8000:8000"   # Symfony (mismo puerto que Laravel)
+      # - "9003:9003"   # Xdebug
+    environment:
+      APP_ENV: ${APP_ENV:-local}
+      APP_SECRET: ${APP_SECRET}
+      DATABASE_URL: "postgresql://${DB_USERNAME}:${DB_PASSWORD}@postgres:5432/${DB_DATABASE}?serverVersion=16&charset=utf8"
+      
+      # Redis
+      REDIS_HOST: redis
+      REDIS_PORT: 6379
+      
+      # RabbitMQ
+      MESSENGER_TRANSPORT_DSN: "amqp://${RABBITMQ_USER}:${RABBITMQ_PASSWORD}@auth_rabbitmq:5672/%2f/messages"
+      
+      # Xdebug (mismo que Laravel)
+      XDEBUG_MODE: debug,develop
+      XDEBUG_CONFIG: client_host=host.docker.internal client_port=9003 idekey=VSCODE
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_started
+    networks:
+      - combinamejor-net
+    mem_limit: 2g
+
+  swagger:
+    image: swaggerapi/swagger-ui
+    container_name: symfony-swagger
+    ports:
+      - "8082:8080"  # Puerto diferente para no chocar si Laravel está up
+    environment:
+      SWAGGER_JSON: /docs/swagger.json
+    volumes:
+      - ./docs:/docs
+    networks:
+      - combinamejor-net
+
+  postgres:
+    image: postgres:16-alpine
+    container_name: combinamejor-postgres
+    restart: unless-stopped
+    ports:
+      - "5432:5432"  # Mismo puerto que Laravel
+    environment:
+      POSTGRES_DB: ${DB_DATABASE:-combinamejor_symfony}
+      POSTGRES_USER: ${DB_USERNAME:-dev}
+      POSTGRES_PASSWORD: ${DB_PASSWORD:-secret}
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${DB_USERNAME:-dev} -d ${DB_DATABASE:-combinamejor_symfony}"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+    networks:
+      - combinamejor-net
+
+  redis:
+    image: redis:alpine
+    container_name: redis-cache
+    ports:
+      - "6379:6379"  # Mismo puerto que Laravel
+    volumes:
+      - redis-data:/data
+    networks:
+      - combinamejor-net
+  
+  rabbitmq:
+    image: rabbitmq:3-management
+    container_name: auth_rabbitmq
+    ports:
+      - "5672:5672"   # Mismo puerto AMQP que Laravel
+      - "15672:15672" # Management UI (mismo que Laravel)
+    environment:
+      RABBITMQ_DEFAULT_USER: ${DB_PASSWORD}
+      RABBITMQ_DEFAULT_PASS: ${RABBITMQ_PASSWORD}
+    volumes:
+      - rabbitmq-data:/var/lib/rabbitmq
+    networks:
+      - combinamejor-net
+
+volumes:
+  postgres-data:
+  redis-data:
+  rabbitmq-data:
+
+networks:
+  combinamejor-net:
+    external: true
