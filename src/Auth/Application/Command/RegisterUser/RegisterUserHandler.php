@@ -41,7 +41,9 @@ class RegisterUserHandler
             UserId::random(),
             $command->name,
             new Email($command->email),
-            PasswordHash::fromPlainText($command->password)
+            PasswordHash::fromPlainText($command->password),
+            new \DateTimeImmutable(),
+            null
         );
 
         $this->userRepository->save($user);

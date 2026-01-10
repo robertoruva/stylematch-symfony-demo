@@ -71,7 +71,9 @@ class RegisterUserHandlerTest extends TestCase
                     UserId::random(),
                     'Existing User',
                     new Email('existing@test.com'),
-                    PasswordHash::fromPlainText('pass11111111')
+                    PasswordHash::fromPlainText('pass11111111'),
+                    new \DateTimeImmutable(),
+                    null
                 )
             );
 

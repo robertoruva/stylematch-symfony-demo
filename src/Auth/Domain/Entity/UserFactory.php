@@ -12,7 +12,9 @@ final class UserFactory
         UserId $id,
         string $name,
         Email $email,
-        PasswordHash $plainPassword
+        PasswordHash $plainPassword,
+        \DateTimeImmutable $createdAt,
+        ?\DateTimeImmutable $updateAt
     ): User {
         $name = trim($name);
 
@@ -25,6 +27,8 @@ final class UserFactory
             $name,
             $email,
             $plainPassword,
+            $createdAt,
+            null
         );
     }
 
@@ -39,7 +43,9 @@ final class UserFactory
             UserId::random(),
             $faker->name(),
             new Email($faker->unique()->safeEmail()),
-            PasswordHash::fromPlainText('Password123!')
+            PasswordHash::fromPlainText('Password123!'),
+            new \DateTimeImmutable(),
+            null
         );
     }
 }

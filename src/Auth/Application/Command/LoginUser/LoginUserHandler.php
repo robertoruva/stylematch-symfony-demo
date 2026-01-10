@@ -2,48 +2,53 @@
 
 namespace App\Auth\Application\Command\LoginUser;
 
-use App\Auth\Application\DTO\AuthResponseDTO;
+use App\Auth\Domain\Entity\RefreshToken;
 use App\Auth\Domain\Exception\InvalidCredentialsException;
-use App\Auth\Domain\Exception\UserNotFoundException;
+use App\Auth\Domain\Repository\RefreshTokenRepositoryInterface;
 use App\Auth\Domain\Repository\UserRepositoryInterface;
+use App\Auth\Domain\Service\PasswordComparerInterface;
 use App\Auth\Domain\Service\TokenGeneratorInterface;
 use App\Auth\Domain\ValueObject\Email;
 
-class LoginUserHandler
+final class LoginUserHandler
 {
+    const TIME_TOKEN_DEFAULT = 604800;  // 7 days
+    const TIME_TOKEN_REFRESH = 900; // 15 minutes
+
     public function __construct(
-        private UserRepositoryInterface $userRepository,
-        private TokenGeneratorInterface $tokenGenerator
+        private readonly UserRepositoryInterface $userRepository,
+        private readonly PasswordComparerInterface $passwordComparer,
+        private readonly TokenGeneratorInterface $tokenGenerator,
+        private readonly RefreshTokenRepositoryInterface $refreshTokenRepository
     ) {
     }
 
-    public function __invoke(LoginUserCommand $command): AuthResponseDTO
+    public function __invoke(LoginUserCommand $command): LoginUserResponse
     {
-        return $this->handle($command);
-    }
+        $email = new Email($command->email);
+        $user = $this->userRepository->findByEmail($email);
 
-    /**
-     * @throws UserNotFoundException
-     * @throws InvalidCredentialsException
-     */
-    public function handle(LoginUserCommand $command): AuthResponseDTO
-    {
-        $user = $this->userRepository->findByEmail(new Email($command->email));
-
-        if (!$user) {
-            throw new UserNotFoundException($command->email);
-        }
-        if (!$user->getPassword()->matches($command->password)) {
+        if (!$user === null) {
             throw InvalidCredentialsException::create();
         }
 
-        $token = $this->tokenGenerator->generate($user);
+        if(!$this->passwordComparer->verify($command->password, $user->getPassword())) {
+            throw new InvalidCredentialsException('Invalid credentials');
+        }
 
-        return new AuthResponseDTO(
-            $user->getId()->value(),
-            $user->getName(),
-            $user->getEmail()->value(),
-            $token
+        $accessToken = $this->tokenGenerator->generate($user);
+
+        $refreshToken = RefreshToken::generate(
+            userId: $user->getId(),
+            ttlSeconds: self::TIME_TOKEN_DEFAULT
+        );
+
+        $this->refreshTokenRepository->save($refreshToken);
+
+        return new LoginUserResponse(
+            accessToken: $accessToken->value(),
+            refreshToken: $refreshToken->token(),
+            expiresIn: self::TIME_TOKEN_REFRESH
         );
     }
 }

@@ -45,3 +45,7 @@ composer.lock
 /.php-cs-fixer.cache
 ###< friendsofphp/php-cs-fixer ###
 /.php-cs-fixer.cache
+
+###> lexik/jwt-authentication-bundle ###
+/config/jwt/*.pem
+###< lexik/jwt-authentication-bundle ###

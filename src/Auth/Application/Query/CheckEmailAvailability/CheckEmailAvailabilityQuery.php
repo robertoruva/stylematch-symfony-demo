@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Auth\Application\Query\GetUserById;
+namespace App\Auth\Application\Query\CheckEmailAvailability;
 
 final class CheckEmailAvailabilityQuery
 {

@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<doctrine-mapping xmlns="http://doctrine-project.org/schemas/orm/doctrine-mapping"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://doctrine-project.org/schemas/orm/doctrine-mapping
+        https://www.doctrine-project.org/schemas/orm/doctrine-mapping.xsd">
+    
+    <entity name="App\Auth\Domain\Entity\User" table="users">
+        <!-- Primary Key (UUID) -->
+        <id name="id" type="string" column="id">
+            <generator strategy="NONE" />
+        </id>
+
+        <!-- Simple field -->
+        <field name="name" type="string" column="name" length="255"/>
+
+        <embedded name="email" class="App\Auth\Domain\ValueObject\Email" use-column-prefix="false"/>
+        <embedded name="password" class="App\Auth\Domain\ValueObject\PasswordHash" use-column-prefix="false"/>
+
+        <!-- Timestamps -->
+        <field name="createdAt" type="datetime_immutable" column="created_at"/>
+        <field name="updatedAt" type="datetime_immutable" column="updated_at" nullable="true"/>
+    </entity>
+
+</doctrine-mapping>
+

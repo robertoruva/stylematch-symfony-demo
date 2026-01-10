@@ -8,7 +8,7 @@ use App\Auth\Domain\ValueObject\UserId;
 
 final class User
 {
-    private UserId $id;
+    private string $id;
 
     private string $name;
 
@@ -16,17 +16,44 @@ final class User
 
     private PasswordHash $password;
 
-    public function __construct(UserId $id, string $name, Email $email, PasswordHash $password)
-    {
-        $this->id = $id;
+    private \DateTimeImmutable $createdAt;
+
+    private ?\DateTimeImmutable $updatedAt;
+
+    public function __construct(
+        UserId $id, 
+        string $name, 
+        Email $email, 
+        PasswordHash $password,
+        \DateTimeImmutable $createdAt,
+        ?\DateTimeImmutable $updatedAt = null
+    ) {
+        $this->id = $id->value();
         $this->name = $name;
         $this->email = $email;
         $this->password = $password;
+        $this->createdAt = $createdAt;
+        $this->updatedAt = $updatedAt;
+    }
+
+    public static function register(
+        UserId $id,
+        string $name,
+        Email $email,
+        PasswordHash $password
+    ): self {
+        return new self(
+            $id, 
+            $name, 
+            $email, 
+            $password,
+            new \DateTimeImmutable(),
+        );
     }
 
     public function getId(): UserId
     {
-        return $this->id;
+        return new UserId($this->id);
     }
 
     public function getName(): string
@@ -44,23 +71,26 @@ final class User
         return $this->password;
     }
 
+    public function getCreatedAt(): \DateTimeImmutable
+    {
+        return $this->createdAt;
+    }
+
+    public function getUpdatedAt(): \DateTimeImmutable
+    {
+        return $this->updatedAt;
+    }
+
     public function changePassword(PasswordHash $newPassword): void
     {
         $this->password = $newPassword;
+        $this->updatedAt = new \DateTimeImmutable();
     }
 
     public function updateProfile(string $name, Email $email): void
     {
         $this->name = $name;
         $this->email = $email;
-    }
-
-    public static function register(
-        UserId $id,
-        string $name,
-        Email $email,
-        PasswordHash $password
-    ): self {
-        return new self($id, $name, $email, $password);
+        $this->updatedAt = new \DateTimeImmutable();
     }
 }

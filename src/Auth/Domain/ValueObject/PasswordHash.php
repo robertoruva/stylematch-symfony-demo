@@ -16,7 +16,8 @@ final class PasswordHash
             throw InvalidPasswordException::tooShort();
         }
 
-        return new self(password_hash($password, PASSWORD_BCRYPT));
+        return new self(password_hash($password, PASSWORD_ARGON2ID));
+        //return new self(password_hash($password, PASSWORD_BCRYPT));
     }
 
     public static function fromHash(string $hash): self
@@ -42,6 +43,9 @@ final class PasswordHash
     {
         $info = password_get_info($hash);
 
-        return 'bcrypt' === $info['algoName'];
+        return in_array(
+            $info['algoName'], ['bcrypt', 'argon2id'],
+            true
+        );
     }
 }

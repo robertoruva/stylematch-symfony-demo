@@ -5,13 +5,64 @@ services:
         autowire: true
         autoconfigure: true
 
+    # Auto-register services
     App\:
-        resource: ../src/
+        resource: '../src/'
         exclude:
-            - ../src/DependencyInjection/
-            - ../src/Entity/
-            - ../src/Kernel.php
+            - '../src/DependencyInjection/'
+            - '../src/Entity/'
+            - '../src/Kernel.php'
 
+    # Controllers
     App\Controller\:
-        resource: ../src/Controller/
+        resource: '../src/Controller/'
         tags: ['controller.service_arguments']
+
+    # ============================================
+    # Redis Configuration
+    # ============================================
+    
+    Predis\ClientInterface:
+        class: Predis\Client
+        arguments:
+            -
+                scheme: tcp
+                host: '%env(REDIS_HOST)%'
+                port: '%env(int:REDIS_PORT)%'
+                database: 0
+
+    # ============================================
+    # Auth Bounded Context - Repositories
+    # ============================================
+    
+    # User Repository
+    App\Auth\Domain\Repository\UserRepositoryInterface:
+        alias: App\Auth\Infrastructure\Persistence\Doctrine\DoctrineUserRepository
+
+    # Refresh Token Repository
+    App\Auth\Infrastructure\Security\RedisRefreshTokenRepository:
+        arguments:
+            $redis: '@Predis\ClientInterface'
+
+    App\Auth\Domain\Repository\RefreshTokenRepositoryInterface:
+        alias: App\Auth\Infrastructure\Security\RedisRefreshTokenRepository
+
+    # ============================================
+    # Auth Bounded Context - Services
+    # ============================================
+    
+    # Token Generator
+    App\Auth\Domain\Service\TokenGeneratorInterface:
+        alias: App\Auth\Infrastructure\Security\JWTTokenGenerator
+
+    # Token Revoker
+    App\Auth\Domain\Service\TokenRevokerInterface:
+        alias: App\Auth\Infrastructure\Security\JWTTokenRevoker
+
+    # Message Bus
+    App\Auth\Application\Message\MessageBusInterface:
+        alias: App\Auth\Infrastructure\Message\NullMessageBus
+
+    # Password Comparer
+    App\Auth\Domain\Service\PasswordComparerInterface:
+        alias: App\Auth\Infrastructure\Security\BcryptPasswordComparer
