@@ -15,16 +15,17 @@ final class RegisterController extends AbstractController
 {
     public function __construct(
         private readonly RegisterUserHandler $handler
-    ) {}
+    ) {
+    }
 
     #[Route('/api/auth/register', name: 'auth_register', methods: ['POST'])]
     public function __invoke(Request $request): JsonResponse
     {
         $data = json_decode($request->getContent(), true);
 
-        if(!isset($data['name'], $data['email'], $data['password'])) {
+        if (!isset($data['name'], $data['email'], $data['password'])) {
             return $this->json([
-                'error' => 'Missing required fields: name, email, password'
+                'error' => 'Missing required fields: name, email, password',
             ], Response::HTTP_BAD_REQUEST);
         }
 
@@ -38,15 +39,15 @@ final class RegisterController extends AbstractController
             ($this->handler)($command);
 
             return $this->json([
-                'message' => 'User registered successfully'
-            ], Response::HTTP_CREATED);          
+                'message' => 'User registered successfully',
+            ], Response::HTTP_CREATED);
         } catch (UserAlreadyExistsException $e) {
             return $this->json([
                 'message' => $e->getMessage(),
             ], Response::HTTP_CONFLICT);
         } catch (\Exception $e) {
             return $this->json([
-                'error' => 'Registration failed'
+                'error' => 'Registration failed',
             ], Response::HTTP_INTERNAL_SERVER_ERROR);
         }
     }

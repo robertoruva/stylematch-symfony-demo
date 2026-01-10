@@ -14,16 +14,17 @@ final class LogoutController extends AbstractController
 {
     public function __construct(
         private readonly LogoutUserHandler $handler
-    ) {}
+    ) {
+    }
 
     #[Route('/api/auth/logout', name: 'auth_logout', methods: ['POST'])]
     public function __invoke(Request $request): JsonResponse
     {
         $token = $request->headers->get('Authorization');
 
-        if(!$token) {
+        if (!$token) {
             return $this->json([
-                'error' => 'Missing authorization token'
+                'error' => 'Missing authorization token',
             ], Response::HTTP_UNAUTHORIZED);
         }
 
@@ -32,12 +33,12 @@ final class LogoutController extends AbstractController
         // Validate token is not empty after cleaning
         if (empty($token)) {
             return $this->json([
-                'error' => 'Invalid authorization token'
+                'error' => 'Invalid authorization token',
             ], Response::HTTP_UNAUTHORIZED);
         }
 
-        error_log("LOGOUT CONTROLLER: Token recibido: " . substr($token, 0, 32) . "...");
-        error_log("LOGOUT CONTROLLER: Token length: " . strlen($token));
+        error_log('LOGOUT CONTROLLER: Token recibido: '.substr($token, 0, 32).'...');
+        error_log('LOGOUT CONTROLLER: Token length: '.strlen($token));
 
         try {
             $command = new LogoutUserCommand(token: $token);
@@ -45,11 +46,11 @@ final class LogoutController extends AbstractController
             ($this->handler)($command);
 
             return $this->json([
-                'message' => 'Logout successful'
+                'message' => 'Logout successful',
             ], Response::HTTP_OK);
         } catch (\Exception $e) {
             return $this->json([
-                'error' => 'logout failed'
+                'error' => 'logout failed',
             ], Response::HTTP_INTERNAL_SERVER_ERROR);
         }
     }

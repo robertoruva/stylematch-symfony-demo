@@ -14,6 +14,7 @@ use App\Auth\Domain\Service\PasswordComparerInterface;
 use App\Auth\Domain\Service\TokenGeneratorInterface;
 use App\Auth\Domain\ValueObject\Email;
 use App\Auth\Domain\ValueObject\PasswordHash;
+use App\Auth\Domain\ValueObject\Token;
 use App\Auth\Domain\ValueObject\UserId;
 use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\MockObject\MockObject;
@@ -26,7 +27,7 @@ class LoginUserHandlerTest extends TestCase
     private MockObject&TokenGeneratorInterface $tokenGenerator;
     private MockObject&RefreshTokenRepositoryInterface $refreshTokenRepository;
 
-    protected function setUp(): void 
+    protected function setUp(): void
     {
         parent::setUp();
 
@@ -64,13 +65,15 @@ class LoginUserHandlerTest extends TestCase
             ->with($this->callback(fn ($email) => $email instanceof Email))
             ->willReturn($user);
 
-        $this->tokenGenerator
-            ->method('generate')
-            ->willReturn('fake-token-123');
+        $this->passwordComparer
+            ->method('verify')
+            ->willReturn(true);
+        
 
         $this->tokenGenerator
-        ->method('generate')
-            ->willReturn('fake-token');
+            ->method('generate')
+            ->willReturn(Token::fromString('fake-token-123'));
+
 
         $handler = new LoginUserHandler(
             $this->userRepository,
@@ -85,20 +88,21 @@ class LoginUserHandlerTest extends TestCase
         );
 
         $result = $handler($command);
-        $this->assertNotEmpty($result->token);
+        $this->assertNotEmpty($result->accessToken);
     }
 
     #[Test]
     public function testItThrowsInvalidCredentialsIfPasswordDoesNotMatch(): void
     {
-        $user = $user = $this->createUser();
+        $user = $this->createUser(email: 'test@test.com', password: 'password123');
 
-        $repo = $this->createMock(UserRepositoryInterface::class);
-        $tokenGenerator = $this->createMock(TokenGeneratorInterface::class);
-
-        $repo->method('findByEmail')
-            ->with($this->callback(fn ($email) => $email instanceof Email))
+        $this->userRepository
+            ->method('findByEmail')
             ->willReturn($user);
+
+        $this->passwordComparer
+            ->method('verify')
+            ->willReturn(false); // o el método real que tengas: verify(), matches()...
 
         $handler = new LoginUserHandler(
             $this->userRepository,
@@ -109,21 +113,16 @@ class LoginUserHandlerTest extends TestCase
 
         $this->expectException(InvalidCredentialsException::class);
 
-        $command = new LoginUserCommand('missing@test.com', '1234');
-
+        $command = new LoginUserCommand('test@test.com', 'WRONG');
         $handler($command);
     }
+
 
     #[Test]
     public function testItThrowsExceptionIfUserNotFound(): void
     {
-        $repo = $this->createMock(UserRepositoryInterface::class);
-        $tokenGenerator = $this->createMock(TokenGeneratorInterface::class);
-
-        $repo->method('findByEmail')
-            ->with($this->callback(
-                fn (Email $email) => 'missing@test.com' === $email->value()
-            ))
+        $this->userRepository
+            ->method('findByEmail')
             ->willReturn(null);
 
         $handler = new LoginUserHandler(
@@ -136,28 +135,27 @@ class LoginUserHandlerTest extends TestCase
         $this->expectException(UserNotFoundException::class);
 
         $command = new LoginUserCommand('missing@test.com', 'whatever');
-
         $handler($command);
     }
 
     #[Test]
     public function testItLogsInAUserGenerateToken(): void
     {
-        $user = $user = $this->createUser();
+        $user = $this->createUser(email: 'test@test.com');
 
-        $repo = $this->createMock(UserRepositoryInterface::class);
-        $tokenGenerator = $this->createMock(TokenGeneratorInterface::class);
-
-        $repo->method('findByEmail')
-            ->with($this->callback(
-                fn (Email $email) => 'test@test.com' === $email->value()
-            ))
+        $this->userRepository
+            ->method('findByEmail')
             ->willReturn($user);
 
-        $tokenGenerator->expects($this->once())
+        $this->passwordComparer
+            ->method('verify')
+            ->willReturn(true);
+
+        $this->tokenGenerator
+            ->expects($this->once())
             ->method('generate')
             ->with($user)
-            ->willReturn('fake-token-123');
+            ->willReturn(Token::fromString('fake-token-123'));
 
         $handler = new LoginUserHandler(
             $this->userRepository,
@@ -167,12 +165,8 @@ class LoginUserHandlerTest extends TestCase
         );
 
         $command = new LoginUserCommand('test@test.com', 'password123');
-
         $result = $handler($command);
 
-        $this->assertSame($user->getId()->value(), $result->id);
-        $this->assertSame('Test User', $result->name);
-        $this->assertSame('test@test.com', $result->email);
-        $this->assertSame('fake-token-123', $result->token);
+        $this->assertSame('fake-token-123', $result->accessToken);
     }
 }

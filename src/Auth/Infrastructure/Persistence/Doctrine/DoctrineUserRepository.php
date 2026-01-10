@@ -12,7 +12,8 @@ final class DoctrineUserRepository implements UserRepositoryInterface
 {
     public function __construct(
         private readonly EntityManagerInterface $entityManager
-    ) {}
+    ) {
+    }
 
     public function save(User $user): void
     {
@@ -34,7 +35,7 @@ final class DoctrineUserRepository implements UserRepositoryInterface
 
     public function existsByEmail(Email $email): bool
     {
-        return $this->findByEmail($email) !== null;
+        return null !== $this->findByEmail($email);
     }
 
     public function delete(User $user): void

@@ -4,6 +4,7 @@ namespace App\Auth\Application\Command\LoginUser;
 
 use App\Auth\Domain\Entity\RefreshToken;
 use App\Auth\Domain\Exception\InvalidCredentialsException;
+use App\Auth\Domain\Exception\UserNotFoundException;
 use App\Auth\Domain\Repository\RefreshTokenRepositoryInterface;
 use App\Auth\Domain\Repository\UserRepositoryInterface;
 use App\Auth\Domain\Service\PasswordComparerInterface;
@@ -12,8 +13,8 @@ use App\Auth\Domain\ValueObject\Email;
 
 final class LoginUserHandler
 {
-    const TIME_TOKEN_DEFAULT = 604800;  // 7 days
-    const TIME_TOKEN_REFRESH = 900; // 15 minutes
+    public const TIME_TOKEN_DEFAULT = 604800;  // 7 days
+    public const TIME_TOKEN_REFRESH = 900; // 15 minutes
 
     public function __construct(
         private readonly UserRepositoryInterface $userRepository,
@@ -28,11 +29,14 @@ final class LoginUserHandler
         $email = new Email($command->email);
         $user = $this->userRepository->findByEmail($email);
 
-        if (!$user === null) {
-            throw InvalidCredentialsException::create();
+        if (null === $user) {
+            throw new UserNotFoundException($email);
         }
 
-        if(!$this->passwordComparer->verify($command->password, $user->getPassword())) {
+        // Verify password
+        $isValid = $this->passwordComparer->verify($command->password, $user->getPassword());
+        
+        if (!$isValid) {
             throw new InvalidCredentialsException('Invalid credentials');
         }
 

@@ -13,7 +13,8 @@ final class JWTTokenRevoker implements TokenRevokerInterface
     public function __construct(
         private readonly RefreshTokenRepositoryInterface $refreshTokenRepository,
         private readonly LoggerInterface $logger
-    ) {}
+    ) {
+    }
 
     public function revokeAllTokensForUser(UserId $userId): void
     {
@@ -24,18 +25,19 @@ final class JWTTokenRevoker implements TokenRevokerInterface
     {
         // For JWT: We revoke the refresh token
         // Access tokens are stateless and expire automatically
-        
+
         $refreshToken = $this->refreshTokenRepository->findByToken($token->value());
-        
-        if ($refreshToken === null) {
+
+        if (null === $refreshToken) {
             $this->logger->warning('Attempted to revoke non-existent refresh token', [
-                'token' => substr($token->value(), 0, 8) . '...',
+                'token' => substr($token->value(), 0, 8).'...',
             ]);
+
             return;
         }
 
         $this->refreshTokenRepository->deleteByToken($token->value());
-        
+
         $this->logger->info('Refresh token revoked successfully', [
             'user_id' => $refreshToken->userId()->value(),
         ]);
@@ -51,5 +53,3 @@ final class JWTTokenRevoker implements TokenRevokerInterface
         return true;
     }
 }
-
-

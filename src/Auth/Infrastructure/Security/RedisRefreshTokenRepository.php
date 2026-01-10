@@ -14,11 +14,12 @@ final readonly class RedisRefreshTokenRepository implements RefreshTokenReposito
 
     public function __construct(
         private readonly RedisClient $redis
-    ) {}
+    ) {
+    }
 
     public function save(RefreshToken $token): void
     {
-        $key = self::PREFIX . $token->token();
+        $key = self::PREFIX.$token->token();
         $ttl = $token->expiresAt()->getTimestamp() - time();
 
         // Store token data as JSON
@@ -32,9 +33,9 @@ final readonly class RedisRefreshTokenRepository implements RefreshTokenReposito
         $this->redis->setex($key, max($ttl, 1), $data);
 
         // Add to user's token set
-        $userKey = self::USER_PREFIX . $token->userId()->value();
+        $userKey = self::USER_PREFIX.$token->userId()->value();
         $this->redis->sadd($userKey, [$token->token()]);
-        
+
         // Set expiration on user's token set
         $this->redis->expire($userKey, max($ttl, 1));
     }
@@ -42,10 +43,10 @@ final readonly class RedisRefreshTokenRepository implements RefreshTokenReposito
     public function findByToken(string $token): ?RefreshToken
     {
         $token = trim($token);
-        $key = self::PREFIX . $token;
+        $key = self::PREFIX.$token;
         $data = $this->redis->get($key);
 
-        if ($data === null || $data === false) {
+        if (!$data) {
             return null;
         }
 
@@ -64,67 +65,67 @@ final readonly class RedisRefreshTokenRepository implements RefreshTokenReposito
 
     public function deleteByToken(string $token): void
     {
-        error_log("=== DELETE TOKEN START ===");
-        error_log("Token to delete: " . substr($token, 0, 32) . "...");
-        
+        error_log('=== DELETE TOKEN START ===');
+        error_log('Token to delete: '.substr($token, 0, 32).'...');
+
         $token = trim($token);
-        $key = self::PREFIX . $token;
-        error_log("Redis key: " . $key);
-        
+        $key = self::PREFIX.$token;
+        error_log('Redis key: '.$key);
+
         try {
             // Get user_id before deleting to remove from user set
-            error_log("Attempting GET: " . $key);
+            error_log('Attempting GET: '.$key);
             $data = $this->redis->get($key);
-            error_log("GET result: " . ($data ? "Found" : "Not found"));
-            
-            if ($data !== null && $data !== false) {
-                error_log("Data found, decoding JSON");
+            error_log('GET result: '.($data ? 'Found' : 'Not found'));
+
+            if ($data) {
+                error_log('Data found, decoding JSON');
+
                 try {
                     $decoded = json_decode($data, true, 512, JSON_THROW_ON_ERROR);
-                    $userKey = self::USER_PREFIX . $decoded['user_id'];
-                    
-                    error_log("User key: " . $userKey);
-                    error_log("Removing token from user set");
-                    
+                    $userKey = self::USER_PREFIX.$decoded['user_id'];
+
+                    error_log('User key: '.$userKey);
+                    error_log('Removing token from user set');
+
                     // Remove token from user's set
                     $result = $this->redis->srem($userKey, $token);
-                    error_log("SREM result: " . $result);
-                    
+                    error_log('SREM result: '.$result);
                 } catch (\Exception $e) {
-                    error_log("JSON decode error: " . $e->getMessage());
+                    error_log('JSON decode error: '.$e->getMessage());
                     // Continue with deletion even if user set update fails
                 }
             } else {
-                error_log("Data is null or false, skipping user set removal");
+                error_log('Data is null or false, skipping user set removal');
             }
 
             // Delete the token
-            error_log("Attempting DEL: " . $key);
+            error_log('Attempting DEL: '.$key);
             $result = $this->redis->del([$key]);
-            error_log("DEL result: " . $result);
-            error_log("=== DELETE TOKEN END ===");
-            
+            error_log('DEL result: '.$result);
+            error_log('=== DELETE TOKEN END ===');
         } catch (\Exception $e) {
-            error_log("CRITICAL ERROR in deleteByToken: " . $e->getMessage());
-            error_log("Stack trace: " . $e->getTraceAsString());
+            error_log('CRITICAL ERROR in deleteByToken: '.$e->getMessage());
+            error_log('Stack trace: '.$e->getTraceAsString());
+
             throw $e;
         }
     }
 
     public function deleteAllByUserId(UserId $userId): void
     {
-        $userKey = self::USER_PREFIX . $userId->value();
-        
+        $userKey = self::USER_PREFIX.$userId->value();
+
         // Get all tokens for user
         $tokens = $this->redis->smembers($userKey);
 
         if (!empty($tokens)) {
             // Delete each token
             $keys = array_map(
-                fn(string $token) => self::PREFIX . $token,
+                fn (string $token) => self::PREFIX.$token,
                 $tokens
             );
-            
+
             $this->redis->del($keys);
         }
 

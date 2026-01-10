@@ -21,9 +21,9 @@ final class User
     private ?\DateTimeImmutable $updatedAt;
 
     public function __construct(
-        UserId $id, 
-        string $name, 
-        Email $email, 
+        UserId $id,
+        string $name,
+        Email $email,
         PasswordHash $password,
         \DateTimeImmutable $createdAt,
         ?\DateTimeImmutable $updatedAt = null
@@ -43,9 +43,9 @@ final class User
         PasswordHash $password
     ): self {
         return new self(
-            $id, 
-            $name, 
-            $email, 
+            $id,
+            $name,
+            $email,
             $password,
             new \DateTimeImmutable(),
         );

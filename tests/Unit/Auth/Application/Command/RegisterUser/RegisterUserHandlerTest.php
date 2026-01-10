@@ -12,6 +12,7 @@ use App\Auth\Domain\Repository\UserRepositoryInterface;
 use App\Auth\Domain\Service\TokenGeneratorInterface;
 use App\Auth\Domain\ValueObject\Email;
 use App\Auth\Domain\ValueObject\PasswordHash;
+use App\Auth\Domain\ValueObject\Token;
 use App\Auth\Domain\ValueObject\UserId;
 use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\TestCase;
@@ -34,7 +35,7 @@ class RegisterUserHandlerTest extends TestCase
         $token->expects($this->once())
             ->method('generate')
             ->with($this->isInstanceOf(User::class))
-            ->willReturn('fake-token-123');
+            ->willReturn(Token::fromString('fake-token-123'));
 
         $messageBus->expects($this->once())
             ->method('publish')

@@ -8,8 +8,12 @@ final readonly class LoginUserResponse
         public string $accessToken,
         public string $refreshToken,
         public int $expiresIn
-    ) {}
+    ) {
+    }
 
+    /**
+     * @return array{access_token: string, refresh_token: string, token_type: string, expires_in: int}
+     */
     public function toArray(): array
     {
         return [

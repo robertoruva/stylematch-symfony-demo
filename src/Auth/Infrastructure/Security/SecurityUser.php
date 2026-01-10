@@ -7,7 +7,7 @@ use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
 
 /**
- * Adapter: Wraps Domain User to comply with Symfony Security contracts
+ * Adapter: Wraps Domain User to comply with Symfony Security contracts.
  */
 final class SecurityUser implements UserInterface, PasswordAuthenticatedUserInterface
 {
@@ -19,7 +19,7 @@ final class SecurityUser implements UserInterface, PasswordAuthenticatedUserInte
     }
 
     /**
-     * Get the wrapped Domain User
+     * Get the wrapped Domain User.
      */
     public function getDomainUser(): User
     {
@@ -27,7 +27,7 @@ final class SecurityUser implements UserInterface, PasswordAuthenticatedUserInte
     }
 
     /**
-     * Symfony Security UserInterface implementation
+     * Symfony Security UserInterface implementation.
      */
     public function getUserIdentifier(): string
     {
@@ -35,7 +35,7 @@ final class SecurityUser implements UserInterface, PasswordAuthenticatedUserInte
     }
 
     /**
-     * Symfony Security PasswordAuthenticatedUserInterface implementation
+     * Symfony Security PasswordAuthenticatedUserInterface implementation.
      */
     public function getPassword(): string
     {
@@ -43,7 +43,7 @@ final class SecurityUser implements UserInterface, PasswordAuthenticatedUserInte
     }
 
     /**
-     * Symfony Security UserInterface implementation
+     * Symfony Security UserInterface implementation.
      */
     public function getRoles(): array
     {
@@ -53,7 +53,7 @@ final class SecurityUser implements UserInterface, PasswordAuthenticatedUserInte
     }
 
     /**
-     * Symfony Security UserInterface implementation
+     * Symfony Security UserInterface implementation.
      */
     public function eraseCredentials(): void
     {
@@ -61,7 +61,9 @@ final class SecurityUser implements UserInterface, PasswordAuthenticatedUserInte
     }
 
     /**
-     * Helper method to get user data for JWT payload
+     * Helper method to get user data for JWT payload.
+     * 
+     * @return array{user_id: string, name: string, email: string}
      */
     public function getJWTPayload(): array
     {
