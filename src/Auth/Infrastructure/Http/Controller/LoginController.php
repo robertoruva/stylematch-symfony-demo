@@ -15,16 +15,17 @@ final class LoginController extends AbstractController
 {
     public function __construct(
         private readonly LoginUserHandler $handler
-    ) {}
+    ) {
+    }
 
     #[Route('/api/auth/login', name: 'auth_login', methods: ['POST'])]
     public function __invoke(Request $request): JsonResponse
     {
         $data = json_decode($request->getContent(), true);
 
-        if(!isset($data['email'], $data['password'])) {
+        if (!isset($data['email'], $data['password'])) {
             return $this->json([
-                'message' => 'Missing required fields: email, password'
+                'message' => 'Missing required fields: email, password',
             ], Response::HTTP_BAD_REQUEST);
         }
 
@@ -42,13 +43,13 @@ final class LoginController extends AbstractController
             );
         } catch (InvalidCredentialsException $e) {
             return $this->json([
-                'error' => 'Invalid credentials'
+                'error' => 'Invalid credentials',
             ], Response::HTTP_UNAUTHORIZED);
         } catch (\Exception $e) {
             return $this->json([
                 'error' => 'Login failed',
-                'message' => $e->getMessage(),           
-                'trace' => $e->getTraceAsString()  
+                'message' => $e->getMessage(),
+                'trace' => $e->getTraceAsString(),
             ], Response::HTTP_INTERNAL_SERVER_ERROR);
         }
     }

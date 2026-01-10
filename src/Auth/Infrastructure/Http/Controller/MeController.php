@@ -17,8 +17,8 @@ final class MeController extends AbstractController
             'user' => [
                 'id' => '123e4567-e89b-12d3-a456-426614174000',
                 'name' => 'Test User',
-                'email' => 'test@example.com'
-            ]
+                'email' => 'test@example.com',
+            ],
         ], Response::HTTP_OK);
     }
 }

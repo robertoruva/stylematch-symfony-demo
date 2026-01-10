@@ -17,7 +17,7 @@ final class LogoutUserHandler
 
     public function __invoke(LogoutUserCommand $command): void
     {
-        $this->logger->info('LOGOUT: Starting logout', ['token' => substr($command->token, 0, 16) . '...']);
+        $this->logger->info('LOGOUT: Starting logout', ['token' => substr($command->token, 0, 16).'...']);
 
         try {
             $token = new Token($command->token);
@@ -25,7 +25,6 @@ final class LogoutUserHandler
 
             $this->tokenRevoker->revokeToken($token);
             $this->logger->info('LOGOUT: Token revoked successfully');
-            
         } catch (InvalidTokenException $e) {
             $this->logger->warning('Logout attempted with invalid token format', [
                 'error' => $e->getMessage(),
