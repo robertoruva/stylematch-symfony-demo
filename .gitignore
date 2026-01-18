@@ -49,3 +49,7 @@ composer.lock
 ###> lexik/jwt-authentication-bundle ###
 /config/jwt/*.pem
 ###< lexik/jwt-authentication-bundle ###
+
+###> Personal/Reference Files ###
+PLAN-30-DIAS-COMBINAMEJOR.md
+###< Personal/Reference Files ###
