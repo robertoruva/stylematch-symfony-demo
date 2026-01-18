@@ -1,6 +1,5 @@
 <?php
 
-
 namespace App\Auth\Application\Query\CheckEmailAvailability;
 
 use App\Auth\Application\DTO\EmailAvailabilityDTO;
@@ -12,7 +11,8 @@ final readonly class CheckEmailAvailabilityHandler
 {
     public function __construct(
         private UserRepositoryInterface $userRepository
-    ) {}
+    ) {
+    }
 
     public function __invoke(CheckEmailAvailabilityQuery $query): EmailAvailabilityDTO
     {

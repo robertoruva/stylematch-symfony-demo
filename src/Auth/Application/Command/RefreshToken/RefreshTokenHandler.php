@@ -1,6 +1,5 @@
 <?php
 
-
 namespace App\Auth\Application\Command\RefreshToken;
 
 use App\Auth\Application\Command\LoginUser\LoginUserResponse;
@@ -15,27 +14,29 @@ final readonly class RefreshTokenHandler
         private RefreshTokenRepositoryInterface $refreshTokenRepository,
         private UserRepositoryInterface $userRepository,
         private TokenGeneratorInterface $tokenGenerator
-    ) {}
+    ) {
+    }
 
     public function __invoke(RefreshTokenCommand $command): LoginUserResponse
     {
         // Find and validate refresh token
         $refreshToken = $this->refreshTokenRepository->findByToken($command->refreshToken);
 
-        if ($refreshToken === null) {
+        if (null === $refreshToken) {
             throw new InvalidTokenException('Invalid refresh token');
         }
 
         if ($refreshToken->isExpired()) {
             // Clean up expired token
             $this->refreshTokenRepository->deleteByToken($command->refreshToken);
+
             throw new InvalidTokenException('Refresh token has expired');
         }
 
         // Get user
         $user = $this->userRepository->findById($refreshToken->userId());
 
-        if ($user === null) {
+        if (null === $user) {
             throw new InvalidTokenException('User not found for refresh token');
         }
 

@@ -1,6 +1,5 @@
 <?php
 
-
 namespace App\Auth\Infrastructure\Http\Controller;
 
 use App\Auth\Application\Command\RefreshToken\RefreshTokenCommand;
@@ -16,7 +15,8 @@ final class RefreshTokenController extends AbstractController
 {
     public function __construct(
         private readonly RefreshTokenHandler $handler
-    ) {}
+    ) {
+    }
 
     #[Route('/api/auth/refresh', name: 'auth_refresh', methods: ['POST'])]
     public function __invoke(Request $request): JsonResponse

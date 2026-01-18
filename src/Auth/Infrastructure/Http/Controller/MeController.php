@@ -1,6 +1,5 @@
 <?php
 
-
 namespace App\Auth\Infrastructure\Http\Controller;
 
 use App\Auth\Application\Query\GetCurrentUser\GetCurrentUserHandler;
@@ -16,7 +15,8 @@ final class MeController extends AbstractController
 {
     public function __construct(
         private readonly GetCurrentUserHandler $handler
-    ) {}
+    ) {
+    }
 
     #[Route('/api/auth/me', name: 'auth_me', methods: ['GET'])]
     #[IsGranted('IS_AUTHENTICATED_FULLY')]
@@ -24,12 +24,6 @@ final class MeController extends AbstractController
     {
         /** @var \App\Auth\Infrastructure\Security\SecurityUser $securityUser */
         $securityUser = $this->getUser();
-
-        if ($securityUser === null) {
-            return $this->json([
-                'error' => 'Not authenticated',
-            ], Response::HTTP_UNAUTHORIZED);
-        }
 
         try {
             $query = new GetCurrentUserQuery($securityUser->getUserIdentifier());
