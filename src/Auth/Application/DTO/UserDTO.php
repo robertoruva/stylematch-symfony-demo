@@ -1,6 +1,5 @@
 <?php
 
-
 namespace App\Auth\Application\DTO;
 
 final readonly class UserDTO
@@ -10,8 +9,12 @@ final readonly class UserDTO
         public string $email,
         public string $createdAt,
         public ?string $updatedAt = null
-    ) {}
+    ) {
+    }
 
+    /**
+     * @return array{id: string, email: string, createdAt: string, updatedAt: string|null}
+     */
     public function toArray(): array
     {
         return [

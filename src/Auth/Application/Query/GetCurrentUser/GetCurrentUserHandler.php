@@ -1,6 +1,5 @@
 <?php
 
-
 namespace App\Auth\Application\Query\GetCurrentUser;
 
 use App\Auth\Application\DTO\UserDTO;
@@ -12,7 +11,8 @@ final readonly class GetCurrentUserHandler
 {
     public function __construct(
         private UserRepositoryInterface $userRepository
-    ) {}
+    ) {
+    }
 
     public function __invoke(GetCurrentUserQuery $query): UserDTO
     {
@@ -20,7 +20,7 @@ final readonly class GetCurrentUserHandler
 
         $user = $this->userRepository->findById($userId);
 
-        if ($user === null) {
+        if (null === $user) {
             throw new UserNotFoundException("User with ID {$query->userId} not found");
         }
 

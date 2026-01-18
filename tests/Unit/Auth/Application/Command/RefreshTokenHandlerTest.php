@@ -1,6 +1,5 @@
 <?php
 
-
 namespace App\Tests\Unit\Auth\Application\Command;
 
 use App\Auth\Application\Command\RefreshToken\RefreshTokenCommand;
@@ -36,7 +35,7 @@ final class RefreshTokenHandlerTest extends TestCase
         );
     }
 
-    public function test_it_generates_new_access_token_with_valid_refresh_token(): void
+    public function testItGeneratesNewAccessTokenWithValidRefreshToken(): void
     {
         // Arrange
         $userId = UserId::random();
@@ -82,7 +81,7 @@ final class RefreshTokenHandlerTest extends TestCase
         $this->assertSame(900, $result->expiresIn);
     }
 
-    public function test_it_throws_exception_when_refresh_token_not_found(): void
+    public function testItThrowsExceptionWhenRefreshTokenNotFound(): void
     {
         // Arrange
         $this->refreshTokenRepository
@@ -99,7 +98,7 @@ final class RefreshTokenHandlerTest extends TestCase
         ($this->handler)($command);
     }
 
-    public function test_it_throws_exception_when_refresh_token_is_expired(): void
+    public function testItThrowsExceptionWhenRefreshTokenIsExpired(): void
     {
         // Arrange
         $userId = UserId::random();
@@ -128,7 +127,7 @@ final class RefreshTokenHandlerTest extends TestCase
         ($this->handler)($command);
     }
 
-    public function test_it_throws_exception_when_user_not_found(): void
+    public function testItThrowsExceptionWhenUserNotFound(): void
     {
         // Arrange
         $userId = UserId::random();

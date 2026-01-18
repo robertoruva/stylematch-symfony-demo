@@ -1,6 +1,5 @@
 <?php
 
-
 namespace App\Tests\Unit\Auth\Application\Query;
 
 use App\Auth\Application\Query\GetCurrentUser\GetCurrentUserHandler;
@@ -24,7 +23,7 @@ final class GetCurrentUserHandlerTest extends TestCase
         $this->handler = new GetCurrentUserHandler($this->userRepository);
     }
 
-    public function test_it_returns_user_dto_when_user_exists(): void
+    public function testItReturnsUserDtoWhenUserExists(): void
     {
         // Arrange
         $userId = UserId::random();
@@ -53,7 +52,7 @@ final class GetCurrentUserHandlerTest extends TestCase
         $this->assertNotNull($result->createdAt);
     }
 
-    public function test_it_throws_exception_when_user_not_found(): void
+    public function testItThrowsExceptionWhenUserNotFound(): void
     {
         // Arrange
         $userId = UserId::random();
