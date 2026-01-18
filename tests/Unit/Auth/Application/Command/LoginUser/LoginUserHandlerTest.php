@@ -115,6 +115,7 @@ class LoginUserHandlerTest extends TestCase
         $handler($command);
     }
 
+
     #[Test]
     public function testItThrowsExceptionIfUserNotFound(): void
     {
