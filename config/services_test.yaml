@@ -1,0 +1,23 @@
+# Test-specific service configuration
+when@test:
+    services:
+        _defaults:
+            public: true
+            autowire: true
+            autoconfigure: true
+
+        # Make Auth repositories public for testing
+        App\Auth\Domain\Repository\UserRepositoryInterface: '@App\Auth\Infrastructure\Persistence\Doctrine\DoctrineUserRepository'
+        App\Auth\Domain\Repository\RefreshTokenRepositoryInterface: '@App\Auth\Infrastructure\Security\RedisRefreshTokenRepository'
+        App\Auth\Domain\Service\TokenGeneratorInterface: '@App\Auth\Infrastructure\Security\JWTTokenGenerator'
+
+        # Make Redis client public for testing (inherits from main services.yaml)
+        Predis\ClientInterface:
+            class: Predis\Client
+            public: true
+            arguments:
+                -
+                    scheme: tcp
+                    host: '%env(REDIS_HOST)%'
+                    port: '%env(int:REDIS_PORT)%'
+                    database: 0
