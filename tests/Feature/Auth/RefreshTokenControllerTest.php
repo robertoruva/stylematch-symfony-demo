@@ -105,7 +105,7 @@ final class RefreshTokenControllerTest extends WebTestCase
             self::ME_ENDPOINT,
             [],
             [],
-            ['HTTP_AUTHORIZATION' => 'Bearer ' . $newAccessToken]
+            ['HTTP_AUTHORIZATION' => 'Bearer '.$newAccessToken]
         );
 
         $this->assertResponseStatusCodeSame(Response::HTTP_OK);
@@ -217,7 +217,7 @@ final class RefreshTokenControllerTest extends WebTestCase
         $currentRefreshToken = $tokens['refresh_token'];
 
         // Refresh 3 times
-        for ($i = 0; $i < 3; $i++) {
+        for ($i = 0; $i < 3; ++$i) {
             $client->request(
                 'POST',
                 self::REFRESH_ENDPOINT,
@@ -241,7 +241,7 @@ final class RefreshTokenControllerTest extends WebTestCase
                 self::ME_ENDPOINT,
                 [],
                 [],
-                ['HTTP_AUTHORIZATION' => 'Bearer ' . $refreshData['access_token']]
+                ['HTTP_AUTHORIZATION' => 'Bearer '.$refreshData['access_token']]
             );
             $this->assertResponseStatusCodeSame(Response::HTTP_OK);
         }
@@ -302,7 +302,7 @@ final class RefreshTokenControllerTest extends WebTestCase
             self::ME_ENDPOINT,
             [],
             [],
-            ['HTTP_AUTHORIZATION' => 'Bearer ' . $user1NewTokens['access_token']]
+            ['HTTP_AUTHORIZATION' => 'Bearer '.$user1NewTokens['access_token']]
         );
         $user1Data = json_decode($client->getResponse()->getContent(), true);
         $this->assertEquals('user1@example.com', $user1Data['email']);
@@ -312,7 +312,7 @@ final class RefreshTokenControllerTest extends WebTestCase
             self::ME_ENDPOINT,
             [],
             [],
-            ['HTTP_AUTHORIZATION' => 'Bearer ' . $user2NewTokens['access_token']]
+            ['HTTP_AUTHORIZATION' => 'Bearer '.$user2NewTokens['access_token']]
         );
         $user2Data = json_decode($client->getResponse()->getContent(), true);
         $this->assertEquals('user2@example.com', $user2Data['email']);

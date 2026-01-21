@@ -30,6 +30,7 @@ final class LogoutUserHandler
 
             if (null === $userId) {
                 $this->logger->warning('Invalid or expired JWT token during logout - logout successful anyway');
+
                 return;
             }
 
@@ -43,6 +44,7 @@ final class LogoutUserHandler
             $this->logger->warning('Logout attempted with invalid token format', [
                 'error' => $e->getMessage(),
             ]);
+
             // Don't throw exception - logout is idempotent
             return;
         }

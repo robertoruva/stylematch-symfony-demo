@@ -50,7 +50,7 @@ final class LogoutControllerTest extends WebTestCase
             [],
             [
                 'CONTENT_TYPE' => 'application/json',
-                'HTTP_AUTHORIZATION' => 'Bearer ' . $tokens['access_token'],
+                'HTTP_AUTHORIZATION' => 'Bearer '.$tokens['access_token'],
             ],
             json_encode([])
         );
@@ -81,7 +81,7 @@ final class LogoutControllerTest extends WebTestCase
             [],
             [
                 'CONTENT_TYPE' => 'application/json',
-                'HTTP_AUTHORIZATION' => 'Bearer ' . $tokens['access_token'],
+                'HTTP_AUTHORIZATION' => 'Bearer '.$tokens['access_token'],
             ],
             json_encode([])
         );

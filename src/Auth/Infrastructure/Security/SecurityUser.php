@@ -11,6 +11,9 @@ use Symfony\Component\Security\Core\User\UserInterface;
  */
 final class SecurityUser implements UserInterface, PasswordAuthenticatedUserInterface
 {
+    /**
+     * @param array<string> $roles
+     */
     public function __construct(
         private readonly string $id,
         private readonly string $email,

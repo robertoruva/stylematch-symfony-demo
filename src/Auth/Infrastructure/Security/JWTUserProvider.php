@@ -8,6 +8,9 @@ use Symfony\Component\Security\Core\Exception\UserNotFoundException;
 use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Security\Core\User\UserProviderInterface;
 
+/**
+ * @implements UserProviderInterface<SecurityUser>
+ */
 final class JWTUserProvider implements UserProviderInterface
 {
     public function __construct(

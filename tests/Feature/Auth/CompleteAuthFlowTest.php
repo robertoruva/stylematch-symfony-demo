@@ -99,7 +99,7 @@ final class CompleteAuthFlowTest extends WebTestCase
             self::ME_ENDPOINT,
             [],
             [],
-            ['HTTP_AUTHORIZATION' => 'Bearer ' . $accessToken]
+            ['HTTP_AUTHORIZATION' => 'Bearer '.$accessToken]
         );
 
         $this->assertResponseStatusCodeSame(Response::HTTP_OK);
@@ -147,7 +147,7 @@ final class CompleteAuthFlowTest extends WebTestCase
             self::ME_ENDPOINT,
             [],
             [],
-            ['HTTP_AUTHORIZATION' => 'Bearer ' . $newAccessToken]
+            ['HTTP_AUTHORIZATION' => 'Bearer '.$newAccessToken]
         );
 
         $this->assertResponseStatusCodeSame(Response::HTTP_OK);
@@ -163,7 +163,7 @@ final class CompleteAuthFlowTest extends WebTestCase
             self::ME_ENDPOINT,
             [],
             [],
-            ['HTTP_AUTHORIZATION' => 'Bearer ' . $accessToken]
+            ['HTTP_AUTHORIZATION' => 'Bearer '.$accessToken]
         );
         // Old token might still work depending on implementation
         // This is expected behavior - tokens aren't blacklisted on refresh
@@ -194,7 +194,7 @@ final class CompleteAuthFlowTest extends WebTestCase
             [],
             [
                 'CONTENT_TYPE' => 'application/json',
-                'HTTP_AUTHORIZATION' => 'Bearer ' . $newAccessToken,
+                'HTTP_AUTHORIZATION' => 'Bearer '.$newAccessToken,
             ],
             json_encode([])
         );
@@ -294,7 +294,7 @@ final class CompleteAuthFlowTest extends WebTestCase
                 self::ME_ENDPOINT,
                 [],
                 [],
-                ['HTTP_AUTHORIZATION' => 'Bearer ' . $tokens[$userData['email']]['access_token']]
+                ['HTTP_AUTHORIZATION' => 'Bearer '.$tokens[$userData['email']]['access_token']]
             );
 
             $this->assertResponseStatusCodeSame(Response::HTTP_OK);
@@ -321,7 +321,7 @@ final class CompleteAuthFlowTest extends WebTestCase
             [],
             [
                 'CONTENT_TYPE' => 'application/json',
-                'HTTP_AUTHORIZATION' => 'Bearer ' . $tokens['user1@example.com']['access_token'],
+                'HTTP_AUTHORIZATION' => 'Bearer '.$tokens['user1@example.com']['access_token'],
             ],
             json_encode([])
         );
@@ -333,7 +333,7 @@ final class CompleteAuthFlowTest extends WebTestCase
             self::ME_ENDPOINT,
             [],
             [],
-            ['HTTP_AUTHORIZATION' => 'Bearer ' . $tokens['user2@example.com']['access_token']]
+            ['HTTP_AUTHORIZATION' => 'Bearer '.$tokens['user2@example.com']['access_token']]
         );
         $this->assertResponseStatusCodeSame(Response::HTTP_OK);
 
@@ -342,7 +342,7 @@ final class CompleteAuthFlowTest extends WebTestCase
             self::ME_ENDPOINT,
             [],
             [],
-            ['HTTP_AUTHORIZATION' => 'Bearer ' . $tokens['user3@example.com']['access_token']]
+            ['HTTP_AUTHORIZATION' => 'Bearer '.$tokens['user3@example.com']['access_token']]
         );
         $this->assertResponseStatusCodeSame(Response::HTTP_OK);
     }
@@ -381,7 +381,7 @@ final class CompleteAuthFlowTest extends WebTestCase
         $currentRefreshToken = $loginData['refresh_token'];
 
         // Simulate long user session with multiple refreshes
-        for ($i = 1; $i <= 5; $i++) {
+        for ($i = 1; $i <= 5; ++$i) {
             // Refresh
             $client->request(
                 'POST',
@@ -401,7 +401,7 @@ final class CompleteAuthFlowTest extends WebTestCase
                 self::ME_ENDPOINT,
                 [],
                 [],
-                ['HTTP_AUTHORIZATION' => 'Bearer ' . $refreshData['access_token']]
+                ['HTTP_AUTHORIZATION' => 'Bearer '.$refreshData['access_token']]
             );
             $this->assertResponseStatusCodeSame(Response::HTTP_OK);
 

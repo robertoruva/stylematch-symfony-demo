@@ -48,7 +48,7 @@ final class MeControllerTest extends WebTestCase
             self::ME_ENDPOINT,
             [],
             [],
-            ['HTTP_AUTHORIZATION' => 'Bearer ' . $tokens['access_token']]
+            ['HTTP_AUTHORIZATION' => 'Bearer '.$tokens['access_token']]
         );
 
         $this->assertResponseStatusCodeSame(Response::HTTP_OK);
@@ -126,7 +126,7 @@ final class MeControllerTest extends WebTestCase
             self::ME_ENDPOINT,
             [],
             [],
-            ['HTTP_AUTHORIZATION' => 'Bearer ' . $user1Tokens['access_token']]
+            ['HTTP_AUTHORIZATION' => 'Bearer '.$user1Tokens['access_token']]
         );
         $user1Data = json_decode($client->getResponse()->getContent(), true);
 
@@ -136,7 +136,7 @@ final class MeControllerTest extends WebTestCase
             self::ME_ENDPOINT,
             [],
             [],
-            ['HTTP_AUTHORIZATION' => 'Bearer ' . $user2Tokens['access_token']]
+            ['HTTP_AUTHORIZATION' => 'Bearer '.$user2Tokens['access_token']]
         );
         $user2Data = json_decode($client->getResponse()->getContent(), true);
 
@@ -204,7 +204,7 @@ final class MeControllerTest extends WebTestCase
             self::ME_ENDPOINT,
             [],
             [],
-            ['HTTP_AUTHORIZATION' => 'Bearer ' . $loginData['access_token']]
+            ['HTTP_AUTHORIZATION' => 'Bearer '.$loginData['access_token']]
         );
 
         $this->assertResponseStatusCodeSame(Response::HTTP_OK);

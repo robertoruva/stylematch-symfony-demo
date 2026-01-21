@@ -4,6 +4,9 @@ namespace App\Auth\Application\Command\LoginUser;
 
 final readonly class LoginUserResponse
 {
+    /**
+     * @param array{id: string, name: string, email: string}|null $user
+     */
     public function __construct(
         public string $accessToken,
         public string $refreshToken,
@@ -13,7 +16,7 @@ final readonly class LoginUserResponse
     }
 
     /**
-     * @return array{access_token: string, refresh_token: string, token_type: string, expires_in: int, user?: array}
+     * @return array{access_token: string, refresh_token: string, token_type: string, expires_in: int, user?: array{id: string, name: string, email: string}}
      */
     public function toArray(): array
     {
@@ -24,7 +27,7 @@ final readonly class LoginUserResponse
             'expires_in' => $this->expiresIn,
         ];
 
-        if ($this->user !== null) {
+        if (null !== $this->user) {
             $response['user'] = $this->user;
         }
 
