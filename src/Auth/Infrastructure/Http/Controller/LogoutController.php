@@ -24,7 +24,7 @@ final class LogoutController extends AbstractController
 
         if (!$token) {
             return $this->json([
-                'error' => 'Missing authorization token',
+                'message' => 'Missing authorization token',
             ], Response::HTTP_UNAUTHORIZED);
         }
 
@@ -33,12 +33,9 @@ final class LogoutController extends AbstractController
         // Validate token is not empty after cleaning
         if (empty($token)) {
             return $this->json([
-                'error' => 'Invalid authorization token',
+                'message' => 'Invalid authorization token',
             ], Response::HTTP_UNAUTHORIZED);
         }
-
-        error_log('LOGOUT CONTROLLER: Token recibido: '.substr($token, 0, 32).'...');
-        error_log('LOGOUT CONTROLLER: Token length: '.strlen($token));
 
         try {
             $command = new LogoutUserCommand(token: $token);
@@ -46,11 +43,11 @@ final class LogoutController extends AbstractController
             ($this->handler)($command);
 
             return $this->json([
-                'message' => 'Logout successful',
+                'message' => 'Logged out successfully',
             ], Response::HTTP_OK);
         } catch (\Exception $e) {
             return $this->json([
-                'error' => 'logout failed',
+                'message' => 'logout failed',
             ], Response::HTTP_INTERNAL_SERVER_ERROR);
         }
     }

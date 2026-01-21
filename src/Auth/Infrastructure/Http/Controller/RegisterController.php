@@ -25,7 +25,7 @@ final class RegisterController extends AbstractController
 
         if (!isset($data['name'], $data['email'], $data['password'])) {
             return $this->json([
-                'error' => 'Missing required fields: name, email, password',
+                'message' => 'Missing required fields: name, email, password',
             ], Response::HTTP_BAD_REQUEST);
         }
 
@@ -47,7 +47,7 @@ final class RegisterController extends AbstractController
             ], Response::HTTP_CONFLICT);
         } catch (\Exception $e) {
             return $this->json([
-                'error' => 'Registration failed',
+                'message' => 'Registration failed',
             ], Response::HTTP_INTERNAL_SERVER_ERROR);
         }
     }

@@ -43,14 +43,12 @@ final class LoginController extends AbstractController
             );
         } catch (InvalidCredentialsException $e) {
             return $this->json([
-                'error' => 'Invalid credentials',
+                'message' => $e->getMessage(),
             ], Response::HTTP_UNAUTHORIZED);
         } catch (\Exception $e) {
             return $this->json([
-                'error' => 'Login failed',
                 'message' => $e->getMessage(),
-                'trace' => $e->getTraceAsString(),
-            ], Response::HTTP_INTERNAL_SERVER_ERROR);
+            ], Response::HTTP_UNAUTHORIZED);
         }
     }
 }

@@ -23,20 +23,22 @@ final class RefreshTokenController extends AbstractController
     {
         $data = json_decode($request->getContent(), true);
 
-        if (!isset($data['refreshToken'])) {
+        $refreshToken = $data['refresh_token'] ?? $data['refreshToken'] ?? null;
+
+        if (!$refreshToken) {
             return $this->json([
-                'error' => 'Refresh token is required',
+                'message' => 'Missing required field: refreshToken',
             ], Response::HTTP_BAD_REQUEST);
         }
 
         try {
-            $command = new RefreshTokenCommand($data['refreshToken']);
+            $command = new RefreshTokenCommand($refreshToken);
             $result = ($this->handler)($command);
 
             return $this->json($result->toArray(), Response::HTTP_OK);
         } catch (InvalidTokenException $e) {
             return $this->json([
-                'error' => $e->getMessage(),
+                'message' => $e->getMessage(),
             ], Response::HTTP_UNAUTHORIZED);
         }
     }

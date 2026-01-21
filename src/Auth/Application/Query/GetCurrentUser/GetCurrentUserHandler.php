@@ -26,6 +26,7 @@ final readonly class GetCurrentUserHandler
 
         return new UserDTO(
             id: $user->getId()->value(),
+            name: $user->getName(),
             email: $user->getEmail()->value(),
             createdAt: $user->getCreatedAt()->format('Y-m-d H:i:s'),
             updatedAt: $user->getUpdatedAt()?->format('Y-m-d H:i:s')

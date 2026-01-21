@@ -115,9 +115,14 @@ final readonly class RedisRefreshTokenRepository implements RefreshTokenReposito
     public function deleteAllByUserId(UserId $userId): void
     {
         $userKey = self::USER_PREFIX.$userId->value();
+        error_log('=== DELETE ALL BY USER ID START ===');
+        error_log('UserId: ' . $userId->value());
+        error_log('UserKey: ' . $userKey);
 
         // Get all tokens for user
         $tokens = $this->redis->smembers($userKey);
+        error_log('Tokens found in set: ' . count($tokens));
+        error_log('Token list: ' . json_encode($tokens));
 
         if (!empty($tokens)) {
             // Delete each token
@@ -126,10 +131,15 @@ final readonly class RedisRefreshTokenRepository implements RefreshTokenReposito
                 $tokens
             );
 
-            $this->redis->del($keys);
+            error_log('Keys to delete: ' . json_encode($keys));
+            $result = $this->redis->del($keys);
+            error_log('DEL result for token keys: ' . $result);
         }
 
         // Delete user's token set
-        $this->redis->del([$userKey]);
+        error_log('Deleting user set: ' . $userKey);
+        $result = $this->redis->del([$userKey]);
+        error_log('DEL result for user set: ' . $result);
+        error_log('=== DELETE ALL BY USER ID END ===');
     }
 }

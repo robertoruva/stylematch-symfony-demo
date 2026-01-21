@@ -52,7 +52,12 @@ final class LoginUserHandler
         return new LoginUserResponse(
             accessToken: $accessToken->value(),
             refreshToken: $refreshToken->token(),
-            expiresIn: self::TIME_TOKEN_REFRESH
+            expiresIn: self::TIME_TOKEN_REFRESH,
+            user: [
+                'id' => $user->getId()->value(),
+                'name' => $user->getName(),
+                'email' => $user->getEmail()->value(),
+            ]
         );
     }
 }

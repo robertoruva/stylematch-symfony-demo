@@ -2,36 +2,31 @@
 
 namespace App\Auth\Infrastructure\Security;
 
-use App\Auth\Domain\Entity\User;
 use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
 
 /**
- * Adapter: Wraps Domain User to comply with Symfony Security contracts.
+ * Infrastructure Adapter: DTO that adapts Domain User data to Symfony Security contracts.
+ * This is a simple data holder with NO business logic and NO Domain dependencies.
  */
 final class SecurityUser implements UserInterface, PasswordAuthenticatedUserInterface
 {
-    private User $domainUser;
-
-    public function __construct(User $domainUser)
-    {
-        $this->domainUser = $domainUser;
-    }
-
-    /**
-     * Get the wrapped Domain User.
-     */
-    public function getDomainUser(): User
-    {
-        return $this->domainUser;
+    public function __construct(
+        private readonly string $id,
+        private readonly string $email,
+        private readonly string $password,
+        private readonly string $name,
+        private readonly array $roles = ['ROLE_USER']
+    ) {
     }
 
     /**
      * Symfony Security UserInterface implementation.
+     * Uses user ID as identifier (for JWT token subject).
      */
     public function getUserIdentifier(): string
     {
-        return $this->domainUser->getEmail()->value();
+        return $this->id;
     }
 
     /**
@@ -39,7 +34,7 @@ final class SecurityUser implements UserInterface, PasswordAuthenticatedUserInte
      */
     public function getPassword(): string
     {
-        return $this->domainUser->getPassword()->value();
+        return $this->password;
     }
 
     /**
@@ -47,9 +42,7 @@ final class SecurityUser implements UserInterface, PasswordAuthenticatedUserInte
      */
     public function getRoles(): array
     {
-        // For now, all users have ROLE_USER
-        // You can extend this later with User roles from Domain
-        return ['ROLE_USER'];
+        return $this->roles;
     }
 
     /**
@@ -57,7 +50,31 @@ final class SecurityUser implements UserInterface, PasswordAuthenticatedUserInte
      */
     public function eraseCredentials(): void
     {
-        // Nothing to do here (password is already hashed in Domain)
+        // Nothing to do here (password is already hashed)
+    }
+
+    /**
+     * Get user ID.
+     */
+    public function getId(): string
+    {
+        return $this->id;
+    }
+
+    /**
+     * Get user name.
+     */
+    public function getName(): string
+    {
+        return $this->name;
+    }
+
+    /**
+     * Get user email.
+     */
+    public function getEmail(): string
+    {
+        return $this->email;
     }
 
     /**
@@ -68,9 +85,9 @@ final class SecurityUser implements UserInterface, PasswordAuthenticatedUserInte
     public function getJWTPayload(): array
     {
         return [
-            'user_id' => $this->domainUser->getId()->value(),
-            'name' => $this->domainUser->getName(),
-            'email' => $this->domainUser->getEmail()->value(),
+            'user_id' => $this->id,
+            'name' => $this->name,
+            'email' => $this->email,
         ];
     }
 }

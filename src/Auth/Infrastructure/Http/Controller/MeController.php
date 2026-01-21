@@ -29,12 +29,13 @@ final class MeController extends AbstractController
             $query = new GetCurrentUserQuery($securityUser->getUserIdentifier());
             $userDTO = ($this->handler)($query);
 
-            return $this->json([
-                'data' => $userDTO->toArray(),
-            ], Response::HTTP_OK);
+            return $this->json(
+                $userDTO->toArray(),
+                Response::HTTP_OK
+            );
         } catch (UserNotFoundException) {
             return $this->json([
-                'error' => 'User not found',
+                'message' => 'User not found',
             ], Response::HTTP_NOT_FOUND);
         }
     }

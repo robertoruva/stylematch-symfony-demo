@@ -71,13 +71,29 @@ final class RefreshTokenHandlerTest extends TestCase
             ->with($user)
             ->willReturn($tokenObject);
 
+        // Expect old refresh token to be deleted (token rotation)
+        $this->refreshTokenRepository
+            ->expects($this->once())
+            ->method('deleteByToken')
+            ->with($refreshTokenString);
+
+        // Expect new refresh token to be saved (token rotation)
+        $this->refreshTokenRepository
+            ->expects($this->once())
+            ->method('save')
+            ->with($this->callback(function (RefreshToken $token) use ($userId, $refreshTokenString) {
+                // Verify new token is for the same user but is different
+                return $token->userId()->value() === $userId->value()
+                    && $token->token() !== $refreshTokenString;
+            }));
+
         // Act
         $command = new RefreshTokenCommand($refreshTokenString);
         $result = ($this->handler)($command);
 
         // Assert
         $this->assertSame($newAccessToken, $result->accessToken);
-        $this->assertSame($refreshToken->token(), $result->refreshToken);
+        $this->assertNotSame($refreshTokenString, $result->refreshToken); // New token is different
         $this->assertSame(900, $result->expiresIn);
     }
 

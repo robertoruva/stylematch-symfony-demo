@@ -43,12 +43,17 @@ final readonly class RefreshTokenHandler
         // Generate new access token
         $accessToken = $this->tokenGenerator->generate($user);
 
-        // Optionally: Rotate refresh token (security best practice)
-        // For now, we keep the same refresh token
+        // Rotate refresh token (security best practice)
+        // Delete old refresh token
+        $this->refreshTokenRepository->deleteByToken($command->refreshToken);
+
+        // Generate new refresh token
+        $newRefreshToken = \App\Auth\Domain\Entity\RefreshToken::generate($user->getId());
+        $this->refreshTokenRepository->save($newRefreshToken);
 
         return new LoginUserResponse(
             accessToken: $accessToken->value(),
-            refreshToken: $refreshToken->token(),
+            refreshToken: $newRefreshToken->token(),
             expiresIn: 900 // 15 minutes for access token
         );
     }

@@ -17,8 +17,13 @@ final readonly class JWTTokenGenerator implements TokenGeneratorInterface
 
     public function generate(User $user): Token
     {
-        // Wrap Domain User in SecurityUser adapter
-        $securityUser = new SecurityUser($user);
+        // Create SecurityUser adapter with individual parameters from Domain User
+        $securityUser = new SecurityUser(
+            id: $user->getId()->value(),
+            email: $user->getEmail()->value(),
+            password: $user->getPassword()->value(),
+            name: $user->getName()
+        );
 
         // Generate JWT token using Lexik
         $token = $this->jwtManager->createFromPayload(
@@ -34,11 +39,14 @@ final readonly class JWTTokenGenerator implements TokenGeneratorInterface
         try {
             $payload = $this->jwtManager->parse($token->value());
 
-            if (!isset($payload['sub'])) {
+            // Try user_id first (our custom claim), then sub (Lexik default)
+            $userId = $payload['user_id'] ?? $payload['sub'] ?? null;
+
+            if (!$userId) {
                 return null;
             }
 
-            return UserId::fromString($payload['sub']);
+            return UserId::fromString($userId);
         } catch (\Exception $e) {
             return null;
         }
